@@ -4,7 +4,6 @@
 
 static char buffer[8];
 static int choice; 
-//static char wspace;
 
 typedef enum{true = 1,false=0} bool;
 
@@ -15,8 +14,6 @@ void printNeighors(int lenNodes,int adjmat[lenNodes][lenNodes], int i);
 
 int main(){
     bool defAult = true;
-    //    char buffer[8];
-    //   int choice;
 begin:
     printf("Create Adjacency Matrix (1)\nLoad Default (2)\nQuit (3)\nInput--> ");
 
@@ -46,19 +43,19 @@ begin:
     int toadd[nodes*nodes];
 
     if(create){
-        if(fill(toadd,choice)) defAult = false;
-        else printf("Error detected. Loading default...\n");
+        fill(toadd,choice);
+        defAult = false;
     }
 
     int adjmat[nodes][nodes];
 
     if(defAult){
         int defaultMat[4][4] = 
-        {//        A B C D
-            /* A */{0,1,1,1}, 
-            /* B */{1,0,1,0},
-            /* C */{1,1,0,0},
-            /* D */{1,0,0,0}
+        { //      A B C D
+          /* A */{0,1,1,1}, 
+          /* B */{1,0,1,0},
+          /* C */{1,1,0,0},
+          /* D */{1,0,0,0}
         };
         memcpy(adjmat,defaultMat,sizeof(defaultMat));
     }else{
@@ -66,7 +63,7 @@ begin:
     }
 
     char lastc = 'A'+nodes-1;
-    printf("\n");
+    putchar('\n');
 
     while(1){
         printf("Display Matrix (1)\nSearch element (2)\nQuit (3)\nInput--> ");
@@ -119,12 +116,10 @@ weight:
         }else{
                 ++refRow;
                 toadd[i] = choice;
-                //printf("toadd[%i]:%i\n",i,toadd[i]);
         }
-
         if(refRow >= lenNodes + 'A'){refRow ='A'; ++refRel;}
     }
-    printf("\n");
+    putchar('\n');
     return true;
 }
 
@@ -133,8 +128,6 @@ void fillMat(int lenNodes, int adjmat[lenNodes][lenNodes],int toadd[]){
     for(int i=0,k=0; i<lenNodes; ++i){
         for(int j=0; j<lenNodes; ++j){
             adjmat[i][j] = toadd[k++];
-            //printf("adjmat[%i][%i] = toadd[%i++] = %i\n",i,j,k,toadd[k]);//adjmat[i][j]);
-            //++k;
         }
     }
 }
@@ -163,7 +156,7 @@ void printMatrix(int lenNodes,int adjmat[lenNodes][lenNodes]){
 void printNeighors(int lenNodes,int adjmat[lenNodes][lenNodes], int i){
     char c = 'A';
     while(c<(lenNodes + 'A')) printf("%c  ",c++);
-    printf("\n");
+    putchar('\n');
 
     for(int j=0; j<lenNodes; ++j){
         printf("%i",adjmat[i][j]);
