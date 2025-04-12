@@ -4,8 +4,9 @@
 
 static char buffer[8];
 static int choice; 
+//static char wspace;
 
-typedef enum{ true = 1,false=0} bool;
+typedef enum{true = 1,false=0} bool;
 
 bool fill(int toadd[],int lenNodes);
 void fillMat(int lenNodes, int adjmat[lenNodes][lenNodes],int toadd[]);
@@ -30,7 +31,7 @@ begin:
             scanf("%s",buffer);
             choice = atoi(buffer);
             nodes = choice;
-            if(choice < 1|| choice >= 26){printf("Invalid input\n\n");goto begin;}
+            if(choice < 1|| choice > 26){printf("Invalid input\n\n");goto begin;}
             create = true;
             break;
         case 2:
@@ -42,7 +43,6 @@ begin:
             goto begin;
     }
 
-    printf("Nodes: %i\n",nodes);
     int toadd[nodes*nodes];
 
     if(create){
@@ -65,9 +65,12 @@ begin:
         fillMat(nodes,adjmat,toadd);
     }
 
+    char lastc = 'A'+nodes-1;
+    printf("\n");
+
     while(1){
         printf("Display Matrix (1)\nSearch element (2)\nQuit (3)\nInput--> ");
-        if(!scanf("%s",buffer)) continue;
+        scanf("%s",buffer);
         choice = atoi(buffer);
 
         switch(choice){
@@ -75,17 +78,17 @@ begin:
                 printMatrix(nodes,adjmat);
                 break;
             case 2:
-                printf("Which Element?(A,B,C,D) --> ");
-                if(!scanf("%s",buffer)) continue;
-                if(!(buffer[0] >= 'A' && buffer[0] <= 'D')) goto def;
+                printf("Which Element?(A-%c) --> ",lastc);
+                scanf("%s",buffer);
+                if(buffer[0] < 'A' || buffer[0] > lastc || strlen(buffer)>1) goto def; 
                 else printNeighors(nodes,adjmat,buffer[0] - 'A');
                 break;
             case 3:
                 goto quit;
             default:
 def:
-                    printf("Invalid Input\n\n");
-                    break;
+                printf("Invalid Input\n\n");
+                break;
         }    }
 
 quit:
@@ -94,37 +97,32 @@ quit:
 
 bool fill(int toadd[], int lenNodes){
     char refRel = 'A'; 
-    char refRow;
+    char refRow = 'A';
     int jlen;
 
-    //    char buffer[8];
-    //  int choice; 
-
-    for(int i=0; i<lenNodes; ++i){
-        refRow = 'A';
-        int j = (refRow - 'A');
-        jlen = j + lenNodes;
-        for(;j<jlen; ++j){
-            //printf("refRel: %c, refRow: %c\n",refRel,refRow);
-            
-            if(refRel == refRow){
-                ++refRow;
-                continue;
-            }
-weight:
-            printf("Edge Weight between %c and %c? --> ",refRel,refRow);
-            scanf("%s",buffer);
-            choice = atoi(buffer);
-
-            if(choice < 0 || choice > lenNodes){
-                printf("Invalid weight.\n");
-                goto weight;
-            }else{
-                ++refRow;
-                toadd[j] = choice;
-            }
+    int len = lenNodes*lenNodes;
+    for(int i=0; i<len; ++i){
+        if(refRel == refRow){
+            printf("Edge weight between %c and %c is 0..\n",refRel,refRow);
+            toadd[i] = 0;
+            ++refRow;
+            continue;
         }
-        ++refRel;
+weight:
+        printf("Edge Weight between %c and %c? --> ",refRel,refRow);
+        scanf("%s",buffer);
+        choice = atoi(buffer);
+
+        if(choice < 0 || choice > lenNodes){
+            printf("Invalid weight.\n");
+            goto weight;
+        }else{
+                ++refRow;
+                toadd[i] = choice;
+                //printf("toadd[%i]:%i\n",i,toadd[i]);
+        }
+
+        if(refRow >= lenNodes + 'A'){refRow ='A'; ++refRel;}
     }
     printf("\n");
     return true;
@@ -134,7 +132,9 @@ weight:
 void fillMat(int lenNodes, int adjmat[lenNodes][lenNodes],int toadd[]){
     for(int i=0,k=0; i<lenNodes; ++i){
         for(int j=0; j<lenNodes; ++j){
-            adjmat[i][j] = toadd[k++]; 
+            adjmat[i][j] = toadd[k++];
+            //printf("adjmat[%i][%i] = toadd[%i++] = %i\n",i,j,k,toadd[k]);//adjmat[i][j]);
+            //++k;
         }
     }
 }
@@ -143,16 +143,17 @@ void fillMat(int lenNodes, int adjmat[lenNodes][lenNodes],int toadd[]){
 
 void printMatrix(int lenNodes,int adjmat[lenNodes][lenNodes]){
     char c = 'A';
-
+    
     printf("  ");
-    while(c<(lenNodes + 'A')) printf("%c ",c++);
-    printf("\n");
+    while(c<(lenNodes + 'A')) printf("%c  ",c++);
+    putchar('\n');
 
     c = 'A';
     for(int i=0; i<lenNodes; ++i){
         printf("%c ",c++);
         for(int j=0; j<lenNodes; ++j){
-            printf("%i ",adjmat[i][j]);
+            printf("%i",adjmat[i][j]);
+            printf("%s",(adjmat[i][j]/10) > 0 ? " " : "  "); 
         }
         putchar('\n');
     }
@@ -160,8 +161,13 @@ void printMatrix(int lenNodes,int adjmat[lenNodes][lenNodes]){
 }
 
 void printNeighors(int lenNodes,int adjmat[lenNodes][lenNodes], int i){
+    char c = 'A';
+    while(c<(lenNodes + 'A')) printf("%c  ",c++);
+    printf("\n");
+
     for(int j=0; j<lenNodes; ++j){
-        printf("%i ",adjmat[i][j]);
+        printf("%i",adjmat[i][j]);
+        printf("%s",(adjmat[i][j]/10) > 0 ? " " : "  ");
     }
     printf("\n\n");
 }
